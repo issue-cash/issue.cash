@@ -127,7 +127,7 @@ all_accounts = [
     ]
     # unpack each chain, which is each offer
     for offer in glommed
-    # take only the values
+    # take only the values, which is just our account
     for account in offer.values()
 ]
 
@@ -144,8 +144,9 @@ all_accounts = [
 # ]
 
 
-# print(gatehub_usd_eur_offers[5:8])
+print(gatehub_usd_eur_offers[5:8])
 print(len(combined_usd_offers))
 print(combined_usd_offers[5:8])
 print(len(all_accounts))
 print(all_accounts[5:8])
+print(len(set(all_accounts)), "unique offer creators")

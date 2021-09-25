@@ -113,6 +113,7 @@ combined_usd_offers = [
 all_accounts = [
     account
     for glommed in [
+        # glom all our offers and create chains of lists
         glom(offers, [glom_spec_account_only])
         for offers in [
             bitstamp_usd__xrp_offers,
@@ -124,7 +125,9 @@ all_accounts = [
             gatehub_usd_bitstamp_jpy_offers,
         ]
     ]
+    # unpack each chain, which is each offer
     for offer in glommed
+    # take only the values
     for account in offer.values()
 ]
 

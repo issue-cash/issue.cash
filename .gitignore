@@ -175,10 +175,11 @@ tags
 # Remove???
 samconfig.toml
 
-*.png
-issuer*.txt
-*account*.txt
-issuer*.csv
-issuer*.json
-*offers*.csv
-*offers*.json
+/*.png
+/issuer*.txt
+/*account*.txt
+/*account*.csv
+/issuer*.csv
+/issuer*.json
+/*offers*.csv
+/*offers*.json

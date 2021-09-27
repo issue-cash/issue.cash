@@ -176,12 +176,13 @@ def get_amount(currency, amount):
         #     represented_xrp % 990
         # )
         # normalized_value = int(this_order_taker_pays_value_raw) or 1
-        normalized_value = int(raw) or Decimal("0.01")
+        # normalized_value = raw or Decimal("0.01")
         return IssuedCurrencyAmount(
             currency=currency,
             issuer=this_order_issuer,
             # value=f"{int(this_order_taker_pays_value)}",
-            value=f"{normalized_value}",
+            # value=f"{normalized_value}",
+            value=f"{raw}",
         )
 
 for account in slice_of_order_accounts:

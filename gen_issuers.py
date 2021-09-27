@@ -5,7 +5,7 @@ Generate issuers, persist to file
 import csv
 
 import json
-from random import sample
+from random import sample, shuffle
 from rich import print
 from decimal import Decimal, getcontext as decimalgetcontext
 
@@ -145,11 +145,17 @@ with open("usd_book_offers.json", "r", encoding="utf-8") as jsonfile:
 
 order_accounts: set = {order["Account"] for order in usd_orders}
 print(len(order_accounts))
-
 # slice_of_order_accounts = sample(order_accounts, 4)
-slice_of_order_accounts = sample(list(order_accounts), 40)
+# slice_of_order_accounts = sample(order_accounts, 300)
 # slice_of_order_accounts = sample(list(order_accounts), 100)
 # slice_of_order_accounts = list(order_accounts)
+# order_accounts_list = list(order_accounts)
+# shuffle(order_accounts_list)
+# slice_of_order_accounts = sample(order_accounts_list, 40)
+slice_of_order_accounts = list(order_accounts)
+
+shuffle(slice_of_order_accounts)
+#
 temp_wallets = []
 #
 
@@ -160,7 +166,23 @@ temp_wallets = []
 def get_amount(currency, amount):
     if currency == "XRP":
         return amount
-
+    else:
+        this_order_issuer = mapped_issuers[
+            currency
+        ].classic_address
+        # raw: Decimal = Decimal(amount) * normalization_factor
+        raw: Decimal = Decimal(amount)
+        # this_order_taker_pays_value = this_order_taker_pays_value_raw / (
+        #     represented_xrp % 990
+        # )
+        # normalized_value = int(this_order_taker_pays_value_raw) or 1
+        normalized_value = int(raw) or Decimal("0.01")
+        return IssuedCurrencyAmount(
+            currency=currency,
+            issuer=this_order_issuer,
+            # value=f"{int(this_order_taker_pays_value)}",
+            value=f"{normalized_value}",
+        )
 
 for account in slice_of_order_accounts:
     temp_wallet = generate_faucet_wallet(faucet_client, None, True)
@@ -217,34 +239,37 @@ for account in slice_of_order_accounts:
 
         # we know this datas taker_gets are XRP
         # this_order_taker_gets_currency = my_order["TakerGets"]
-        this_order_taker_gets_raw = my_order["TakerGetsAmount"]
-        represented_xrp = drops_to_xrp(this_order_taker_gets_raw)
+        # this_order_taker_gets_raw = my_order["TakerGetsAmount"]
+        # represented_xrp = drops_to_xrp(this_order_taker_gets_raw)
         # we need to keep this under our faucet value for now of 1000 xrp
         # TODO, fail the offer?
         # this_order_taker_gets: str = xrp_to_drops(represented_xrp % 990)
         # this_order_taker_gets: str = xrp_to_drops(represented_xrp % 990)
-        this_order_taker_gets: str = xrp_to_drops(represented_xrp)
+        # this_order_taker_gets: str = xrp_to_drops(represented_xrp)
         
-        this_order_taker_gets = get_amount(my_order["TakerGets"], my_order["TakerGetsAmount"])
+        this_order_taker_gets = get_amount(my_order["TakerGetsCurrency"], my_order["TakerGetsAmount"])
 
-        # normalization_factor = Decimal(this_order_taker_gets) / Decimal(xrp_to_drops(represented_xrp))
-        normalization_factor = 1
-
-        this_order_issuer = mapped_issuers[
-            my_order["TakerPaysCurrency"]
-        ].classic_address
-        this_order_taker_pays_value_raw: Decimal = Decimal(my_order["TakerPaysAmount"]) * normalization_factor
-        # this_order_taker_pays_value = this_order_taker_pays_value_raw / (
-        #     represented_xrp % 990
+        # # normalization_factor = Decimal(this_order_taker_gets) / Decimal(xrp_to_drops(represented_xrp))
+        # normalization_factor = 1
+        #
+        # this_order_issuer = mapped_issuers[
+        #     my_order["TakerPaysCurrency"]
+        # ].classic_address
+        # this_order_taker_pays_value_raw: Decimal = Decimal(my_order["TakerPaysAmount"]) * normalization_factor
+        # # this_order_taker_pays_value = this_order_taker_pays_value_raw / (
+        # #     represented_xrp % 990
+        # # )
+        # # normalized_value = int(this_order_taker_pays_value_raw) or 1
+        # normalized_value = int(this_order_taker_pays_value_raw) or Decimal("0.01")
+        # this_order_taker_pays = IssuedCurrencyAmount(
+        #     currency=my_order["TakerPaysCurrency"],
+        #     issuer=this_order_issuer,
+        #     # value=f"{int(this_order_taker_pays_value)}",
+        #     value=f"{normalized_value}",
         # )
-        # normalized_value = int(this_order_taker_pays_value_raw) or 1
-        normalized_value = int(this_order_taker_pays_value_raw) or Decimal("0.01")
-        this_order_taker_pays = IssuedCurrencyAmount(
-            currency=my_order["TakerPaysCurrency"],
-            issuer=this_order_issuer,
-            # value=f"{int(this_order_taker_pays_value)}",
-            value=f"{normalized_value}",
-        )
+
+        this_order_taker_pays = get_amount(my_order["TakerPaysCurrency"],
+                                           my_order["TakerPaysAmount"])
 
         # create_my_offer_tx = OfferCreate(
         create_my_offer_tx_missing = OfferCreate(

@@ -99,9 +99,7 @@ glom_spec_any_any = {
     "TakerPaysCurrency": ("TakerPays", "currency"),
 }
 
-glom_spec_account_only = {
-    "Account": "Account"
-}
+glom_spec_account_only = {"Account": "Account"}
 
 # combined_usd_offers = glom(bitstamp_usd__xrp_offers, [glom_spec_xrp_any]) + glom(
 #     gatehub_usd__xrp_offers, [glom_spec_xrp_any]
@@ -113,6 +111,13 @@ minimal_usd_offers = [
         for offers in [
             bitstamp_usd__xrp_offers,
             gatehub_usd__xrp_offers,
+        ]
+    ]
+    + [
+        glom(offers, [Coalesce(glom_spec_any_xrp, SKIP)])
+        for offers in [
+            bitstamp_xrp__usd_offers,
+            gatehub_xrp__usd_offers,
         ]
     ]
     for offer in glommed
@@ -187,9 +192,9 @@ print(len(set(all_accounts)), "unique offer creators")
 csv.register_dialect("offers", delimiter=";", quoting=csv.QUOTE_NONE)
 
 with open("usd_book_offers.csv", "w", newline="", encoding="utf-8") as csvfile:
-    offerwriter = csv.DictWriter(csvfile,
-                                 fieldnames=combined_usd_offers[0].keys(),
-                                 dialect="offers")
+    offerwriter = csv.DictWriter(
+        csvfile, fieldnames=combined_usd_offers[0].keys(), dialect="offers"
+    )
     offerwriter.writeheader()
     offerwriter.writerows(combined_usd_offers)
 

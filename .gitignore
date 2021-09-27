@@ -176,7 +176,9 @@ tags
 samconfig.toml
 
 *.png
+issuer*.txt
+*account*.txt
 issuer*.csv
 issuer*.json
-offers*.csv
-offers*.json
+*offers*.csv
+*offers*.json

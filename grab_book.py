@@ -1,7 +1,10 @@
 """
 Grab book offers
 """
-from glom import glom, Coalesce, SKIP
+import csv
+import json
+
+from glom import glom, Coalesce, Literal, SKIP
 from rich import print
 from xrpl.clients.json_rpc_client import JsonRpcClient
 from xrpl.models.currencies import IssuedCurrency, XRP
@@ -13,7 +16,9 @@ MAINNET_GATEHUB = "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"
 
 
 # client = JsonRpcClient("https://xrplcluster.com")
-client = JsonRpcClient("http://localhost:5005")
+mainnet_client = JsonRpcClient("http://localhost:5005")
+# testnet_client = JsonRpcClient("http://localhost:5006")
+testnet_client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
 
 
 EUR_bitstamp = IssuedCurrency(currency="EUR", issuer=MAINNET_BITSTAMP)
@@ -35,7 +40,7 @@ def get_book_offers(taker_gets, taker_pays):
     book_offers_request = BookOffers(
         taker_gets=taker_gets, taker_pays=taker_pays, limit=500
     )
-    book_offers_response = client.request(book_offers_request)
+    book_offers_response = mainnet_client.request(book_offers_request)
     book_offers = book_offers_response.result["offers"]
     return book_offers
 
@@ -67,18 +72,31 @@ gatehub_usd_bitstamp_jpy_offers = get_book_offers(USD_gatehub, JPY_bitstamp)
 
 # 'any' refers to 'any issued currency'; xrp is the native asset.
 glom_spec_xrp_any = {
-    "TakerGets": "TakerGets",
-    "TakerPays": ("TakerPays", "value"),
+    "Account": "Account",
+    "TakerGetsAmount": "TakerGets",
+    "TakerGetsCurrency": Literal("XRP"),
+    "TakerPaysAmount": ("TakerPays", "value"),
+    "TakerPaysCurrency": ("TakerPays", "currency"),
 }
 
 glom_spec_any_xrp = {
-    "TakerPays": "TakerPays",
-    "TakerGets": ("TakerGets", "value"),
+    # "TakerGetsValue": "TakerGets",
+    # "TakerGets": Literal("XRP"),
+    # "TakerPaysValue": ("TakerPays", "value"),
+    # "TakerPays": ("TakerPays", "currency"),
+    "Account": "Account",
+    "TakerPaysAmount": "TakerPays",
+    "TakerPaysCurrency": Literal("XRP"),
+    "TakerGetsAmount": ("TakerGets", "value"),
+    "TakerGetsCurrency": ("TakerGets", "currency"),
 }
 
 glom_spec_any_any = {
-    "TakerGets": ("TakerGets", "value"),
-    "TakerPays": ("TakerPays", "value"),
+    "Account": "Account",
+    "TakerGetsAmount": ("TakerGets", "value"),
+    "TakerGetsCurrency": ("TakerGets", "currency"),
+    "TakerPaysAmount": ("TakerPays", "value"),
+    "TakerPaysCurrency": ("TakerPays", "currency"),
 }
 
 glom_spec_account_only = {
@@ -88,6 +106,18 @@ glom_spec_account_only = {
 # combined_usd_offers = glom(bitstamp_usd__xrp_offers, [glom_spec_xrp_any]) + glom(
 #     gatehub_usd__xrp_offers, [glom_spec_xrp_any]
 # )
+minimal_usd_offers = [
+    offer
+    for glommed in [
+        glom(offers, [glom_spec_xrp_any])
+        for offers in [
+            bitstamp_usd__xrp_offers,
+            gatehub_usd__xrp_offers,
+        ]
+    ]
+    for offer in glommed
+]
+
 combined_usd_offers = [
     offer
     for glommed in [
@@ -150,3 +180,20 @@ print(combined_usd_offers[5:8])
 print(len(all_accounts))
 print(all_accounts[5:8])
 print(len(set(all_accounts)), "unique offer creators")
+
+# testnet_wallet = generate_faucet_wallet(testnet_client, None, True)
+# print(testnet_wallet)
+
+csv.register_dialect("offers", delimiter=";", quoting=csv.QUOTE_NONE)
+
+with open("usd_book_offers.csv", "w", newline="", encoding="utf-8") as csvfile:
+    offerwriter = csv.DictWriter(csvfile,
+                                 fieldnames=combined_usd_offers[0].keys(),
+                                 dialect="offers")
+    offerwriter.writeheader()
+    offerwriter.writerows(combined_usd_offers)
+
+
+with open("usd_book_offers.json", "w", encoding="utf-8") as jsonfile:
+    # json.dump(combined_usd_offers, jsonfile)
+    json.dump(minimal_usd_offers, jsonfile)

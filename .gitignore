@@ -174,3 +174,9 @@ tags
 
 # Remove???
 samconfig.toml
+
+*.png
+issuer*.csv
+issuer*.json
+offers*.csv
+offers*.json

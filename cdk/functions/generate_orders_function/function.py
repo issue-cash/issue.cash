@@ -14,6 +14,7 @@ from xrpl.models.transactions import (
     OfferCreateFlag,
     Payment,
     TrustSet,
+    Memo,
 )
 from xrpl.transaction import (
     safe_sign_and_submit_transaction,
@@ -26,8 +27,6 @@ from xrpl.wallet import generate_faucet_wallet, Wallet
 from xrpl.utils import drops_to_xrp, xrp_to_drops
 
 testnet_client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
-
-
 
 
 def get_amount(currency, amount, this_order_issuer):
@@ -82,6 +81,14 @@ def handler(event, context):
         temp_wallet_trustline_set_tx, testnet_client
     )
 
+    satirical_branding = Memo(
+        memo_data=(
+            b"Need cash now (on the testnet)?"
+            b" Get cash now (on the testnet)!"
+            b" go to: https://issue.cash"
+        ).hex()
+    )
+
     while count < 5:
         try:
             temp_wallet_issuance_tx_missing = Payment(
@@ -89,6 +96,7 @@ def handler(event, context):
                 # destination=temp_wallet.classic_address,
                 destination=temp_wallet.classic_address,
                 amount=issued_cash,
+                memos=[satirical_branding],
             )
             temp_wallet_issuance_tx = safe_sign_and_autofill_transaction(
                 temp_wallet_issuance_tx_missing,
@@ -104,7 +112,9 @@ def handler(event, context):
             count -= 1
             time.sleep(10 * random.random() + 1.3)
 
-    this_order_issuer = Wallet(seed=event["issuer"]["seed"], sequence=None).classic_address
+    this_order_issuer = Wallet(
+        seed=event["issuer"]["seed"], sequence=None
+    ).classic_address
 
     for offer in event["offers"]:
         this_offer_taker_gets = get_amount(offer["tg"], offer["tgv"], this_order_issuer)
@@ -118,6 +128,7 @@ def handler(event, context):
             flags=OfferCreateFlag.TF_PASSIVE,
             fee="10",
             # sequence=get_latest_open_ledger_sequence(testnet_client) + 10,
+            memos=[Memo(memo_data=b"Offer created by issue.cash".hex()), satirical_branding],
         )
         create_my_offer_tx = safe_sign_and_autofill_transaction(
             create_my_offer_tx_missing,

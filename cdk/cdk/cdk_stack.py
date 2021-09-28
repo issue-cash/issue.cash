@@ -144,9 +144,9 @@ class CdkStack(cdk.Stack):
                     # works pretty good with the faucet endpoint, this is also
                     # the expected max txns the faucet can put in a single
                     # ledger
-                    # max_concurrency=10,
+                    max_concurrency=10,
                     # CRAZZZY
-                    max_concurrency=30,
+                    # max_concurrency=30,
                     # does this work?
                     result_path=sfn.JsonPath.DISCARD,
                 ).iterator(

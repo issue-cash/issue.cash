@@ -83,36 +83,36 @@ def issue_cash(issuer_wallet, currency, issue_to, client):
         issuer=issuer_wallet.classic_address,
         value="1" + "0" * 6,
     )
-    dump_wallet_trustline_set_tx_missing = TrustSet(
-        # account=dump_wallet.classic_address,
+    issue_to_wallet_trustline_set_tx_missing = TrustSet(
+        # account=issue_to_wallet.classic_address,
         account=issue_to.classic_address,
         limit_amount=issued_cash_limit,
     )
-    dump_wallet_trustline_set_tx = safe_sign_and_autofill_transaction(
-        transaction=dump_wallet_trustline_set_tx_missing,
-        # wallet=dump_wallet,
+    issue_to_wallet_trustline_set_tx = safe_sign_and_autofill_transaction(
+        transaction=issue_to_wallet_trustline_set_tx_missing,
+        # wallet=issue_to_wallet,
         wallet=issue_to,
         client=client,
     )
-    # dump_wallet_trustline_set_tx_resp = send_reliable_submission(dump_wallet_trustline_set_tx, client)
-    dump_wallet_trustline_set_tx_resp = submit_transaction(
-        dump_wallet_trustline_set_tx, client
+    # issue_to_wallet_trustline_set_tx_resp = send_reliable_submission(issue_to_wallet_trustline_set_tx, client)
+    issue_to_wallet_trustline_set_tx_resp = submit_transaction(
+        issue_to_wallet_trustline_set_tx, client
     )
 
-    dump_wallet_issuance_tx_missing = Payment(
+    issue_to_wallet_issuance_tx_missing = Payment(
         account=issuer_wallet.classic_address,
-        # destination=dump_wallet.classic_address,
+        # destination=issue_to_wallet.classic_address,
         destination=issue_to.classic_address,
         amount=issued_cash,
     )
-    dump_wallet_issuance_tx = safe_sign_and_autofill_transaction(
-        dump_wallet_issuance_tx_missing,
+    issue_to_wallet_issuance_tx = safe_sign_and_autofill_transaction(
+        issue_to_wallet_issuance_tx_missing,
         wallet=issuer_wallet,
         client=client,
     )
 
-    # dump_wallet_issuance_tx_resp = send_reliable_submission(dump_wallet_issuance_tx, client)
-    dump_wallet_issuance_tx_resp = submit_transaction(dump_wallet_issuance_tx, client)
+    # issue_to_wallet_issuance_tx_resp = send_reliable_submission(issue_to_wallet_issuance_tx, client)
+    issue_to_wallet_issuance_tx_resp = submit_transaction(issue_to_wallet_issuance_tx, client)
 
 
 issuers = [gen_issuer(currency) for currency in ISSUER_CURRENCIES]

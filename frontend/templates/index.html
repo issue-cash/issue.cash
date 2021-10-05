@@ -71,9 +71,26 @@
 </head>
 <body>
    <h1>Issue.Cash</h1>
+   <h2>Current Issuers</h2>
+   <ul>
+       {% for issuer in issuers %}
+       <li>{{ issuer.issuer_currency }}: 
+           <a href="https://explorer-testnet.xrplf.org/{{ issuer.account }}">
+               {{ issuer.account }}
+           </a>
+       </li>
+       {% endfor %}
+   </ul>
    <p>Want some cash?</p>
+
    <form action="get-cash">
-       <input type="text" class="text" value="rABC123..." name="">
+       {% for issuer in issuers %}
+       <label for="{{ issuer.issuer_currency }}">
+       <input type="text" 
+              class="text"
+              value="rABC123..." 
+              name="{{ issuer.issuer_currency }}">
+       {% endfor %}
        <input type="submit" class="text" value="Submit" name="">
    </form>
 

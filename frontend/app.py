@@ -21,6 +21,8 @@ jinja_env = Environment(
 
 index_template = jinja_env.get_template("index.html")
 
+# Remember this is testnet, these scans include 
+# the ephemeral secret seed for this round marketplaces are infinite
 issuers_table_scan_resp = issuers_table.scan()
 issuers = issuers_table_scan_resp["Items"]
 
@@ -29,7 +31,7 @@ def handler(event, context):
     print("##EVENT")
     print(event)
     print("issuers are", issuers)
-    index_html = index_template.render({})
+    index_html = index_template.render(issuers=issuers)
     return {
         "statusCode": 200,
         "headers": {"Content-Type": "text/html"},

@@ -1,3 +1,4 @@
 -r base.txt
 ipython
 rich
+boto3

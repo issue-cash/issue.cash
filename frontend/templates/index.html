@@ -85,7 +85,8 @@
 
    <form action="get-cash">
        {% for issuer in issuers %}
-       <label for="{{ issuer.issuer_currency }}">
+       <label for="{{ issuer.issuer_currency }}"> {{ issuer.issuer_currency }}
+       </label>
        <input type="text" 
               class="text"
               value="rABC123..." 

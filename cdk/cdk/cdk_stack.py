@@ -81,22 +81,23 @@ class CdkStack(cdk.Stack):
             },
         )
         # add table r/w permissions to our issuer generator
+        issuers_table_dynamodb_crud_statement = iam.PolicyStatement(
+            actions=[
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+            ],
+            effect=iam.Effect.ALLOW,
+            resources=[
+                f"arn:aws:dynamodb:*:*:table/{issuers_table.table_name}",
+            ],
+        )
         generate_issuers_function.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=[
-                    "dynamodb:BatchGetItem",
-                    "dynamodb:GetItem",
-                    "dynamodb:Query",
-                    "dynamodb:Scan",
-                    "dynamodb:BatchWriteItem",
-                    "dynamodb:PutItem",
-                    "dynamodb:UpdateItem",
-                ],
-                effect=iam.Effect.ALLOW,
-                resources=[
-                    f"arn:aws:dynamodb:*:*:table/{issuers_table.table_name}",
-                ],
-            )
+            issuers_table_dynamodb_crud_statement
         )
 
         generate_faucet_wallet_function = lambda_.Function(

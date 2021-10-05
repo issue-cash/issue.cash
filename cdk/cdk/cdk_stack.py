@@ -30,10 +30,25 @@ class CdkStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        issuers_table = dynamodb.Table(
+        # issuers_table = dynamodb.Table(
+        #     self,
+        #     "IssuersTable",
+        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+        # )
+
+        issuers_table_key_schema = dynamodb.CfnTable.KeySchemaProperty(
+            attribute_name="issuer_currency", key_type="HASH"
+        )
+        issuers_table = dynamodb.CfnTable(
             self,
             "IssuersTable",
-            billing_mode=dynamodb.PAY_PER_REQUEST,
+            key_schema=[issuers_table_key_schema],
+            attribute_definitions=[
+                dynamodb.CfnTable.AttributeDefinitionProperty(
+                    attribute_name="issuer_currency", attribute_type="S"
+                ),
+            ],
+            billing_mode="PAY_PER_REQUEST",
         )
 
         generate_issuers_function = lambda_.Function(

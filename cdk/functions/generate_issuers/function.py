@@ -1,3 +1,6 @@
+import os
+import boto3
+
 from xrpl.clients import JsonRpcClient
 from xrpl.models.amounts import IssuedCurrencyAmount, Amount
 from xrpl.models.transactions import (
@@ -15,6 +18,13 @@ from xrpl.transaction import (
 
 # Testnet client
 testnet_client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
+
+dynamodb = boto3.resource("dynamodb")
+
+ISSUERS_TABLE_NAME = os.environ["ISSUERS_TABLE_NAME"]
+
+issuers_table = dynamodb.Table(ISSUERS_TABLE_NAME)
+
 
 def handler(event, context):
     # return "Hello, World!"
@@ -37,9 +47,15 @@ def handler(event, context):
         issuer_wallet_set_tx,
         testnet_client,
     )
+    # persist issuers
+    # TODO the returned data is every row we persist
+    put_resp = issuers_table.put_item(
+        Item=dict(issuer_currency="USD", seed=wallet_seed, account=wallet_account),
+    )
     return {
         "issuers": {
             "USD": {"seed": wallet_seed, "acct": wallet_account},
+            # TODO expand to all issuers
             "dfg": {"seed": "123", "acct": "abc123"},
         }
     }

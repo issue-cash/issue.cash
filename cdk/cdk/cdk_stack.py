@@ -8,6 +8,8 @@ from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_stepfunctions as sfn
 from aws_cdk import aws_stepfunctions_tasks as tasks
 from aws_cdk import aws_dynamodb as dynamodb
+from aws_cdk import aws_sam as sam
+from aws_cdk import aws_iam as iam
 
 
 bundle_python_function_with_requirements = cdk.BundlingOptions(
@@ -42,6 +44,7 @@ class CdkStack(cdk.Stack):
         issuers_table = dynamodb.CfnTable(
             self,
             "IssuersTable",
+            table_name="IssuersTable",
             key_schema=[issuers_table_key_schema],
             attribute_definitions=[
                 dynamodb.CfnTable.AttributeDefinitionProperty(
@@ -50,10 +53,22 @@ class CdkStack(cdk.Stack):
             ],
             billing_mode="PAY_PER_REQUEST",
         )
+        # issuers_table = sam.CfnSimpleTable(
+        #     self,
+        #     "IssuersTable",
+        #     table_name="IssuersTable",
+        #     key_schema=[issuers_table_key_schema],
+        #     attribute_definitions=[
+        #         dynamodb.CfnTable.AttributeDefinitionProperty(
+        #             attribute_name="issuer_currency", attribute_type="S"
+        #         ),
+        #     ],
+        #     billing_mode="PAY_PER_REQUEST",
+        # )
 
         generate_issuers_function = lambda_.Function(
             self,
-            "GenerateIssuers",
+            "GenerateIssuersFunction",
             code=lambda_.Code.from_asset(
                 "functions/generate_issuers/",
                 bundling=bundle_python_function_with_requirements,
@@ -61,6 +76,27 @@ class CdkStack(cdk.Stack):
             runtime=lambda_.Runtime.PYTHON_3_9,
             handler="function.handler",
             timeout=cdk.Duration.seconds(60),
+            environment={
+                "ISSUERS_TABLE_NAME": issuers_table.table_name,
+            },
+        )
+        # add table r/w permissions to our issuer generator
+        generate_issuers_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                ],
+                effect=iam.Effect.ALLOW,
+                resources=[
+                    f"arn:aws:dynamodb:*:*:table/{issuers_table.table_name}",
+                ],
+            )
         )
 
         generate_faucet_wallet_function = lambda_.Function(
@@ -103,7 +139,7 @@ class CdkStack(cdk.Stack):
 
         state_machine = sfn.StateMachine(
             self,
-            "MyStateMachine",
+            "CreateMarketClone",
             # .next(
             #     tasks.LambdaInvoke(
             #         self,

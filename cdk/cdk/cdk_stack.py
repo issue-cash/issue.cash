@@ -53,7 +53,7 @@ class CdkStack(cdk.Stack):
 
         generate_issuers_function = lambda_.Function(
             self,
-            "MyLambdaFunction",
+            "GenerateIssuers",
             code=lambda_.Code.from_asset(
                 "functions/generate_issuers/",
                 bundling=bundle_python_function_with_requirements,

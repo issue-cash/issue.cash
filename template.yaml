@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  issue.cash a XRPL DEX Development Service
+
+  This template contains the frontend and records
+
+
+Parameters:
+  CertificateArn:
+    Type: String
+  StackHostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+
+
+Resources:
+  IssueCashHTTP:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: IssueCashHTTP
+      ProtocolType: HTTP
+      Target: !Sub
+        "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FrontendFunction.Arn}/invocations"
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+        AllowOrigins:
+          - "*"
+
+  FrontendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: frontend
+      Handler: app.handler
+      MemorySize: 128
+      Runtime: python3.9
+
+  FrontendPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - IssueCashHTTP
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref FrontendFunction
+      Principal: apigateway.amazonaws.com
+    
+  IssueCashDomainName:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: issue.cash
+      DomainNameConfigurations:
+        - EndpointType: REGIONAL
+          CertificateArn: !Ref CertificateArn
+          CertificateName: issuecashAppCert
+
+  HTTPRootMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    Properties:
+      DomainName: !Ref IssueCashDomainName
+      ApiId: !Ref IssueCashHTTP
+      Stage: $default
+
+  IssueCashRecordSetAlias:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt IssueCashDomainName.RegionalDomainName
+        HostedZoneId: !GetAtt IssueCashDomainName.RegionalHostedZoneId
+        EvaluateTargetHealth: false
+      HostedZoneId: !Ref StackHostedZoneId
+      Type: A
+      Name: issue.cash

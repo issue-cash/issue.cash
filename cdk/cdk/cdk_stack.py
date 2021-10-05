@@ -7,6 +7,8 @@ from aws_cdk import core as cdk
 from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_stepfunctions as sfn
 from aws_cdk import aws_stepfunctions_tasks as tasks
+from aws_cdk import aws_dynamodb as dynamodb
+
 
 bundle_python_function_with_requirements = cdk.BundlingOptions(
     image=lambda_.Runtime.PYTHON_3_9.bundling_docker_image,
@@ -28,7 +30,11 @@ class CdkStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # The code that defines your stack goes here
+        issuers_table = dynamodb.Table(
+            self,
+            "IssuersTable",
+            billing_mode=dynamodb.PAY_PER_REQUEST,
+        )
 
         generate_issuers_function = lambda_.Function(
             self,
@@ -80,7 +86,6 @@ class CdkStack(cdk.Stack):
             memory_size=512,
         )
 
-
         state_machine = sfn.StateMachine(
             self,
             "MyStateMachine",
@@ -101,15 +106,11 @@ class CdkStack(cdk.Stack):
                     "GenerateIssuers",
                     input_path="$.Payload",
                     lambda_function=generate_issuers_function,
-                    result_selector={
-                        "issuers.$": "$.Payload.issuers"
-                    },
+                    result_selector={"issuers.$": "$.Payload.issuers"},
                     # result_path="$.issuers",
                     # output_path="$.Payload.issuers",
                 )
             )
-
-
             # .next(
             #     tasks.LambdaInvoke(
             #         self,
@@ -171,5 +172,5 @@ class CdkStack(cdk.Stack):
                     .next(sfn.Succeed(self, "FaucetAccountCreated"))
                 )
             )
-            .next(sfn.Succeed(self, "GreetedWorld")),
+            .next(sfn.Succeed(self, "CreatedMarket")),
         )

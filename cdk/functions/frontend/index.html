@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>issue.cash</title>
+    <style type="text/css">
+        body {
+            color: #000;
+            background: #eee;
+        }
+
+        .moneyWing, .coin {
+            position: absolute;
+            width: 64px;
+            font-size: 64px;
+            height: 64px;
+        }
+
+        .moneyWing::after {
+            content: "💸";
+        }
+
+        .coin::after {
+            content: "🪙";
+        }
+
+        @keyframes fly {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-1600px, 1600px);
+            }
+        }
+
+        .fly1 { 
+            animation: fly 9s linear infinite;
+        }
+        
+        .fly2 {
+            animation: fly 16s linear infinite;
+        }
+
+        .fly3 {
+            animation: fly 25s linear infinite;
+        }
+
+        .fly4 {
+            animation: fly 12s 17s linear infinite;
+        }
+
+        /* startingPoints */
+
+        .start1 { 
+            right: -2%;
+            top: -17%;
+        }
+
+        .start2 {
+            right: 10%;
+            top: -19%;
+        }
+
+        .start3 {
+            right: 20%;
+            top: -18%;
+        }
+
+    </style>
+</head>
+<body>
+   <h1>Issue.Cash</h1>
+   <p>Want some cash?</p>
+   <form action="get-cash">
+       <input type="text" class="text" value="rABC123..." name="">
+       <input type="submit" class="text" value="Submit" name="">
+   </form>
+
+   <!-- <div class="moneyWing"></div> -->
+   <!-- <div class="coin"></div> -->
+   <div class="coin fly1 start1"></div>
+   <div class="coin fly2 start2"></div>
+   <!-- <div class="coin fly3 start3"></div> -->
+   <!-- <div class="moneyWing fly1 start1"></div> -->
+   <!-- <div class="moneyWing fly2 start2"></div> -->
+   <div class="moneyWing fly3 start3"></div>
+
+   <script type="text/javascript">
+       for (i = 0; i < 53; i++ ) {
+                  // console.log(Math.floor(Math.random()*3));
+                  el = document.createElement('div');
+                  el2 = document.createElement('div');
+                  el.classList.add('coin');
+                  el.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
+                  el2.classList.add('moneyWing');
+                  el2.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
+                  el.style.right = `${Math.random() * 70 * -1}%`
+                  el.style.top = `${Math.random() * -90}%`;
+                  el2.style.right = `${Math.random() * 70 * -3}%`
+                  el2.style.top = `${Math.random() * -90}%`;
+                  document.body.appendChild(el)
+                  document.body.appendChild(el2)
+      }
+
+   </script>
+</body>
+</html>

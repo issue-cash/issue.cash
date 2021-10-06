@@ -100,6 +100,16 @@ def handler(event, context):
                         "body": f"Successfully sent $$ to {account}"
                     }
                 except XRPLReliableSubmissionException as err:
+                    if "tecPATH_DRY" in str(err):
+                        return {
+                            "statusCode": 400,
+                            "headers": {"Content-Type": "text/plain"},
+                            "body": """
+                            You'll need to set a Trustline first!
+                            Go back and use the link under the issuer :)
+                            """
+                        }
+
                     print("err is", err)
                     retried_count += 1
             return {

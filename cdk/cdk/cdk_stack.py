@@ -201,7 +201,12 @@ class CdkStack(cdk.Stack):
                     # CRAZZZY
                     # max_concurrency=30,
                     # does this work?
-                    result_path=sfn.JsonPath.DISCARD,
+                    # result_path=sfn.JsonPath.DISCARD,
+                    result_path="$.issuers",
+                    result_selector={
+                        "issuers.$": "$.issuers"
+                    },
+                    output_path="$.issuers",
                 ).iterator(
                     tasks.LambdaInvoke(
                         self,

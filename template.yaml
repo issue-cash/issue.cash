@@ -35,9 +35,9 @@ Resources:
     Properties:
       CodeUri: frontend
       Handler: app.handler
-      MemorySize: 128
+      MemorySize: 256
       Runtime: python3.9
-      Timeout: 8
+      Timeout: 15
       Environment:
         Variables: 
           ISSUERS_TABLE_NAME: !Ref IssuersTableName

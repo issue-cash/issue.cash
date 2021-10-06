@@ -79,6 +79,7 @@
    <main>
    <div>
    <h1>Issue.Cash</h1>
+   <p><em>An <a href="https://xrpl.org/decentralized-exchange.html">XRPL DEX</a> Development Service</em></p>
    <h2>Current Issuers</h2>
        {% for issuer in issuers %}
        <div class="card">
@@ -92,6 +93,12 @@
                        Created {{ issuer.market_epoch }}
                    </li>
                    <li>
+                       <a href="https://test.xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
+                           Set Trustline with XUMM.Community (Testnet) &disin;
+                           <em>Do this first!</em>
+                       </a>
+                   </li>
+                   <li>
                        <a href="https://explorer-testnet.xrplf.org/{{ issuer.account }}">
                            Explorer
                        </a>
@@ -101,15 +108,10 @@
                            Sologenic Testnet Market [{{ issuer.issuer_currency }}/XRP]
                        </a>
                    </li>
-                   <li>
-                       <a href="https://test.xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
-                           Set Trustline XUMM.Community (Testnet)
-                       </a>
-                   </li>
                </ul>
        </div>
        {% endfor %}
-   <p>Want some cash?</p>
+   <p>Want some cash?  🤑</p>
 
    <form action="get-cash">
        {% for issuer in issuers %}

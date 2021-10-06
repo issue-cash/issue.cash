@@ -51,14 +51,14 @@ def handler(event, context):
     )
     # persist issuers
     # TODO the returned data is every row we persist
-    put_resp = issuers_table.put_item(
-        Item=dict(
-            issuer_currency="USD",
-            seed=wallet_seed,
-            account=wallet_account,
-            market_epoch=datetime.utcnow().isoformat(),
-        ),
-    )
+    # put_resp = issuers_table.put_item(
+    #     Item=dict(
+    #         issuer_currency="USD",
+    #         seed=wallet_seed,
+    #         account=wallet_account,
+    #         market_epoch=datetime.utcnow().isoformat(),
+    #     ),
+    # )
     return {
         "issuers": {
             "USD": {"seed": wallet_seed, "acct": wallet_account},

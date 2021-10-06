@@ -89,7 +89,8 @@ def handler(event, context):
         ).hex()
     )
 
-    while count < 5:
+    issuance_success = False
+    while not issuance_success:
         try:
             temp_wallet_issuance_tx_missing = Payment(
                 account=issuer_wallet.classic_address,
@@ -107,10 +108,12 @@ def handler(event, context):
             temp_wallet_issuance_tx_resp = send_reliable_submission(
                 temp_wallet_issuance_tx, testnet_client
             )
-            break
+            issuance_success = True
         except Exception:
-            count -= 1
-            time.sleep(10 * random.random() + 1.3)
+            # bail, but don't fail the batch
+            if context.get_remaining_time_in_millis() < 6000:
+                return
+            time.sleep(3 * random.random() + 1.3)
 
     this_order_issuer = Wallet(
         seed=event["issuer"]["seed"], sequence=None

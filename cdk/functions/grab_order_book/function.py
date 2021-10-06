@@ -87,7 +87,6 @@ def handler(event, context):
 
     return {
         # "offers": minimal_usd_offers,
-        # "unique_accounts": list({offer["Account"] for offer in minimal_usd_offers}),
         "distinct_accounts": [
             {
                 "issuer": {

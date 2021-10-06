@@ -37,7 +37,7 @@ Resources:
       Handler: app.handler
       MemorySize: 128
       Runtime: python3.9
-      Timeout: 15
+      Timeout: 10
       Environment:
         Variables: 
           ISSUERS_TABLE_NAME: !Ref IssuersTableName

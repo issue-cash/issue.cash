@@ -2,7 +2,7 @@ import os
 import pathlib
 
 from functools import reduce
-
+from datetime import datetime
 
 import boto3
 
@@ -41,6 +41,21 @@ index_template = jinja_env.get_template("index.html")
 # issuers = issuers_table_scan_resp["Items"]
 # issuers_map = reduce(lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict())
 
+
+def get_issuers():
+    issuers_table_scan_resp = issuers_table.scan()
+    issuers = issuers_table_scan_resp["Items"]
+    issuers_map = reduce(
+        lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict()
+    )
+    print("issuers are", issuers)
+    print("issuers_map are", issuers_map)
+    return issuers, issuers_map
+
+
+CACHE_START = datetime.utcnow()
+ISSUERS, ISSUERS_MAP = get_issuers()
+
 satirical_branding = Memo(
     memo_data=(
         b"Need cash now (on the testnet)?"
@@ -55,6 +70,16 @@ def handler(event, context):
     # print(event)
     # print("##CONTEXT")
     # print(context)
+    global CACHE_START
+    global ISSUERS
+    global ISSUERS_MAP
+
+    execution_start_time = datetime.utcnow()
+
+    # bust cache
+    if (cached_length := execution_start_time - CACHE_START).seconds > (900):
+        ISSUERS, ISSUERS_MAP = get_issuers()
+        CACHE_START = execution_start_time
 
     path = event["requestContext"]["http"]["path"]
     method = event["requestContext"]["http"]["method"]
@@ -65,17 +90,10 @@ def handler(event, context):
         return {"statusCode": 404}
     # Remember this is testnet, these scans include
     # the ephemeral secret seed for this round marketplaces are infinite
-    issuers_table_scan_resp = issuers_table.scan()
-    issuers = issuers_table_scan_resp["Items"]
-    issuers_map = reduce(
-        lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict()
-    )
-    print("issuers are", issuers)
-    print("issuers_map are", issuers_map)
 
     if path == "/get-cash" and method == "GET" and querystring_dict is not None:
         for currency, account in querystring_dict.items():
-            currency_request_seed = issuers_map[currency]
+            currency_request_seed = ISSUERS_MAP[currency]
 
             issuer_wallet = Wallet(seed=currency_request_seed, sequence=None)
             issued_cash = IssuedCurrencyAmount(
@@ -127,7 +145,7 @@ def handler(event, context):
             }
 
     if path == "/":
-        index_html = index_template.render(issuers=issuers)
+        index_html = index_template.render(issuers=ISSUERS)
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "text/html"},

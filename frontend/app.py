@@ -38,7 +38,7 @@ index_template = jinja_env.get_template("index.html")
 # the ephemeral secret seed for this round marketplaces are infinite
 issuers_table_scan_resp = issuers_table.scan()
 issuers = issuers_table_scan_resp["Items"]
-issuers_map = reduce(lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, {})
+issuers_map = reduce(lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict())
 
 
 def handler(event, context):

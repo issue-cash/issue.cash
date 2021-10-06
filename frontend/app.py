@@ -43,8 +43,8 @@ index_template = jinja_env.get_template("index.html")
 
 
 def handler(event, context):
-    print("##EVENT")
-    print(event)
+    # print("##EVENT")
+    # print(event)
     # print("##CONTEXT")
     # print(context)
 
@@ -83,8 +83,8 @@ def handler(event, context):
                 amount=issued_cash,
                 # memos=[satirical_branding],
             )
-            count = 0
-            while count < 5:
+            retried_count = 0
+            while retried_count < 5:
                 try:
                     issue_tx = safe_sign_and_autofill_transaction(
                         issue_tx_missing,
@@ -92,16 +92,30 @@ def handler(event, context):
                         client=testnet_client,
                     )
                     issue_tx_resp = send_reliable_submission(issue_tx, testnet_client)
-                    # TODO re-render template with details and txn link
                     print(issue_tx_resp)
-                    break
+                    return {
+                        "statusCode": 200,
+                        "headers": {"Content-Type": "text/plain"},
+                        # TODO re-render template with details and txn link
+                        "body": f"Successfully sent $$ to {account}"
+                    }
                 except XRPLReliableSubmissionException as err:
                     print("err is", err)
-                    pass
+                    retried_count += 1
+            return {
+                "statusCode": 500,
+                "headers": {"Content-Type": "text/plain"},
+                "body": "Try again in a few moments!"
+            }
 
-    index_html = index_template.render(issuers=issuers)
+    if path == "/":
+        index_html = index_template.render(issuers=issuers)
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "text/html"},
+            "body": index_html,
+        }
+
     return {
-        "statusCode": 200,
-        "headers": {"Content-Type": "text/html"},
-        "body": index_html,
+        "statusCode": 404
     }

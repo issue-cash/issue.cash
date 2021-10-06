@@ -157,9 +157,8 @@ class CdkStack(cdk.Stack):
                     "GenerateIssuers",
                     input_path="$.Payload",
                     lambda_function=generate_issuers_function,
+                    # what are we picking from the output?
                     result_selector={"issuers.$": "$.Payload.issuers"},
-                    # result_path="$.issuers",
-                    # output_path="$.Payload.issuers",
                 )
             )
             # .next(
@@ -174,10 +173,12 @@ class CdkStack(cdk.Stack):
                     self,
                     "GrabOrderBookTask",
                     lambda_function=grab_order_book_function,
-                    result_path="$.orders",
+                    # what are we picking from output?
                     result_selector={
                         "work.$": "$.Payload.distinct_accounts",
                     },
+                    # where do we put the output in the state?
+                    result_path="$.orders",
                 )
             )
             .next(
@@ -185,7 +186,7 @@ class CdkStack(cdk.Stack):
                     self,
                     "GenerateOrderWallets",
                     # not relevant with output_path changed above
-                    items_path="$.work",
+                    items_path="$.orders.work",
                     # parameters={
                     #     "issuers.$": "$.issuers",
                     #     "work.$": "$.orders.work",

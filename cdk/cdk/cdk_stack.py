@@ -236,11 +236,13 @@ class CdkStack(cdk.Stack):
                         "GenerateOrderWalletFromFaucet",
                         lambda_function=generate_faucet_wallet_function,
                         # parameters=
-                        result_path="$.wallet",
+                        # pick from the output
                         result_selector={
                             "seed.$": "$.Payload.seed",
                             "account.$": "$.Payload.account",
                         },
+                        # place the output in the state
+                        result_path="$.wallet",
                     )
                     .next(
                         tasks.LambdaInvoke(

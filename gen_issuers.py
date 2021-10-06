@@ -57,7 +57,7 @@ def gen_issuer(currency: str):
 # async def issue_cash(currency, issuer_wallet):
 # async with AsyncWebsocketClient("ws://localhost:6006") as client:
 def issue_cash(issuer_wallet, currency, issue_to, client):
-    issuer_wallet_set_tx = AccountSet(
+    issuer_wallet_set_tx_missing = AccountSet(
         account=issuer_wallet.classic_address,
         # TODO: this should match an average expected in production
         transfer_rate=0,
@@ -66,7 +66,7 @@ def issue_cash(issuer_wallet, currency, issue_to, client):
         set_flag=AccountSetFlag.ASF_DEFAULT_RIPPLE,
     )
     issuer_wallet_set_tx = safe_sign_and_autofill_transaction(
-        issuer_wallet_set_tx, issuer_wallet, client
+        issuer_wallet_set_tx_missing, issuer_wallet, client
     )
     issuer_wallet_set_tx_resp = send_reliable_submission(
         issuer_wallet_set_tx,

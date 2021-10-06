@@ -134,7 +134,7 @@ class CdkStack(cdk.Stack):
             ),
             runtime=lambda_.Runtime.PYTHON_3_9,
             handler="function.handler",
-            timeout=cdk.Duration.seconds(600),
+            timeout=cdk.Duration.seconds(900),
             memory_size=512,
         )
 

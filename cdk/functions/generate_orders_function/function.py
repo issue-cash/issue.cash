@@ -128,7 +128,10 @@ def handler(event, context):
             flags=OfferCreateFlag.TF_PASSIVE,
             fee="10",
             # sequence=get_latest_open_ledger_sequence(testnet_client) + 10,
-            memos=[Memo(memo_data=b"Offer created by issue.cash".hex()), satirical_branding],
+            memos=[
+                Memo(memo_data=b"Offer created by issue.cash".hex()),
+                satirical_branding,
+            ],
         )
         create_my_offer_tx = safe_sign_and_autofill_transaction(
             create_my_offer_tx_missing,
@@ -137,6 +140,11 @@ def handler(event, context):
             check_fee=False,
         )
         try:
+            # we need to bail before trying another offer if we have less than
+            # 6 seconds
+            # at a 15minute timeout; we created some offers
+            if context.get_remaining_time_in_millis() < 6000:
+                return
             create_my_offer_resp = send_reliable_submission(
                 create_my_offer_tx, testnet_client
             )

@@ -1,0 +1,8 @@
+-e .
+aws-cdk.core
+aws-cdk.aws-lambda
+aws-cdk.aws-dynamodb
+aws-cdk.aws-stepfunctions
+aws-cdk.aws-stepfunctions-tasks
+aws-cdk.aws-sam
+aws-cdk.aws-iam

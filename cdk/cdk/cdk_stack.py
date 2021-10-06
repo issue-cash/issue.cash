@@ -179,9 +179,9 @@ class CdkStack(cdk.Stack):
                     result_path="$.orders",
                     result_selector={
                         "work.$": "$.Payload.distinct_accounts",
-                        "issuers.$": "$.Payload.issuers",
+                        # "issuers.$": "$.issuers",
                     },
-                    output_path="$.orders",
+                    # output_path="$.orders",
                 )
             )
             .next(

@@ -7,6 +7,12 @@
         body {
             color: #000;
             background: #eee;
+            overflow: hidden;
+        }
+
+        main > div {
+            position: relative;
+            z-index: 99;
         }
 
         .moneyWing, .coin {
@@ -70,30 +76,39 @@
     </style>
 </head>
 <body>
+   <main>
+   <div>
    <h1>Issue.Cash</h1>
    <h2>Current Issuers</h2>
-   <ul>
        {% for issuer in issuers %}
-       <li>{{ issuer.issuer_currency }}: 
-           <ul>
-               <li>
-                   <a href="https://explorer-testnet.xrplf.org/{{ issuer.account }}">
-                       {{ issuer.account }}
-                   </a>
-               </li>
-               <li>
-                   <a href="https://sologenic.org/trade?network=testnet&market={{ issuer.issuer_currency }}%2B{{ issuer.account }}%2FXRP">
-                       Sologenic Testnet Market ({{ issuer.issuer_currency }}/XRP)
-                   </a>
-               </li>
-               <li>
-                   <a href="https://test.xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
-                       Set Trustline XUMM.Community (Testnet)
-                   </a>
-               </li>
-       </li>
+       <div class="card">
+
+           <h3>{{ issuer.issuer_currency }}</h3>
+               <ul>
+                   <li>
+                       <code>{{ issuer.account }}</code>
+                   </li>
+                   <li>
+                       Created {{ issuer.market_epoch }}
+                   </li>
+                   <li>
+                       <a href="https://explorer-testnet.xrplf.org/{{ issuer.account }}">
+                           Explorer
+                       </a>
+                   </li>
+                   <li>
+                       <a href="https://sologenic.org/trade?network=testnet&market={{ issuer.issuer_currency }}%2B{{ issuer.account }}%2FXRP">
+                           Sologenic Testnet Market [{{ issuer.issuer_currency }}/XRP]
+                       </a>
+                   </li>
+                   <li>
+                       <a href="https://test.xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
+                           Set Trustline XUMM.Community (Testnet)
+                       </a>
+                   </li>
+               </ul>
+       </div>
        {% endfor %}
-   </ul>
    <p>Want some cash?</p>
 
    <form action="get-cash">
@@ -102,11 +117,22 @@
        </label>
        <input type="text" 
               class="text"
-              value="rABC123..." 
+              placeholder="rABC123..." 
               name="{{ issuer.issuer_currency }}">
        {% endfor %}
        <input type="submit" class="text" value="Submit" name="">
    </form>
+
+   <p>Need a testnet account in XUMM?</p>
+   <p>
+       <a href="https://xumm.community/tools">xumm.community/tools</a>
+       has a walkthrough for setting up your 
+       <a href="https://xumm.app">XUMM wallet</a>
+       with
+       <a href="https://xrpl.org/xrp-testnet-faucet.html">Testnet credentials.</a>
+   </p>
+   </div>
+   </main>
 
    <!-- <div class="moneyWing"></div> -->
    <!-- <div class="coin"></div> -->

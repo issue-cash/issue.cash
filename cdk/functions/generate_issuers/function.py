@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 import boto3
 
 from xrpl.clients import JsonRpcClient
@@ -50,7 +52,12 @@ def handler(event, context):
     # persist issuers
     # TODO the returned data is every row we persist
     put_resp = issuers_table.put_item(
-        Item=dict(issuer_currency="USD", seed=wallet_seed, account=wallet_account),
+        Item=dict(
+            issuer_currency="USD",
+            seed=wallet_seed,
+            account=wallet_account,
+            market_epoch=datetime.utcnow().isoformat(),
+        ),
     )
     return {
         "issuers": {

@@ -36,9 +36,10 @@ index_template = jinja_env.get_template("index.html")
 
 # Remember this is testnet, these scans include
 # the ephemeral secret seed for this round marketplaces are infinite
-issuers_table_scan_resp = issuers_table.scan()
-issuers = issuers_table_scan_resp["Items"]
-issuers_map = reduce(lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict())
+# this is cached outside the execution, to limit executions
+# issuers_table_scan_resp = issuers_table.scan()
+# issuers = issuers_table_scan_resp["Items"]
+# issuers_map = reduce(lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict())
 
 
 def handler(event, context):
@@ -47,9 +48,6 @@ def handler(event, context):
     # print("##CONTEXT")
     # print(context)
 
-    print("issuers are", issuers)
-    print("issuers_map are", issuers_map)
-
     path = event["requestContext"]["http"]["path"]
     method = event["requestContext"]["http"]["method"]
     querystring_dict = event.get("queryStringParameters")
@@ -57,6 +55,16 @@ def handler(event, context):
     # detect favicon request
     if path == "/favicon.ico":
         return {"statusCode": 404}
+    # Remember this is testnet, these scans include
+    # the ephemeral secret seed for this round marketplaces are infinite
+    issuers_table_scan_resp = issuers_table.scan()
+    issuers = issuers_table_scan_resp["Items"]
+    issuers_map = reduce(
+        lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict()
+    )
+    print("issuers are", issuers)
+    print("issuers_map are", issuers_map)
+
 
     if path == "/get-cash" and method == "GET" and querystring_dict is not None:
         for currency, account in querystring_dict.items():

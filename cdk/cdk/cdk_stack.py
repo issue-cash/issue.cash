@@ -11,7 +11,6 @@ from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_sam as sam
 from aws_cdk import aws_iam as iam
 
-
 bundle_python_function_with_requirements = cdk.BundlingOptions(
     image=lambda_.Runtime.PYTHON_3_9.bundling_docker_image,
     command=[
@@ -197,7 +196,8 @@ class CdkStack(cdk.Stack):
                     # works pretty good with the faucet endpoint, this is also
                     # the expected max txns the faucet can put in a single
                     # ledger
-                    max_concurrency=10,
+                    max_concurrency=2,
+                    # max_concurrency=10,
                     # CRAZZZY
                     # max_concurrency=30,
                     # does this work?

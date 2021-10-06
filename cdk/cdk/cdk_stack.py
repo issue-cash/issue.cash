@@ -79,6 +79,20 @@ class CdkStack(cdk.Stack):
                 "ISSUERS_TABLE_NAME": issuers_table.table_name,
             },
         )
+        persist_issuers_function = lambda_.Function(
+            self,
+            "PersistIssuersFunction",
+            code=lambda_.Code.from_asset(
+                "functions/persist_issuers/",
+                bundling=bundle_python_function_with_requirements,
+            ),
+            runtime=lambda_.Runtime.PYTHON_3_9,
+            handler="function.handler",
+            timeout=cdk.Duration.seconds(19),
+            environment={
+                "ISSUERS_TABLE_NAME": issuers_table.table_name,
+            },
+        )
         # add table r/w permissions to our issuer generator
         issuers_table_dynamodb_crud_statement = iam.PolicyStatement(
             actions=[
@@ -96,6 +110,9 @@ class CdkStack(cdk.Stack):
             ],
         )
         generate_issuers_function.add_to_role_policy(
+            issuers_table_dynamodb_crud_statement
+        )
+        persist_issuers_function.add_to_role_policy(
             issuers_table_dynamodb_crud_statement
         )
 
@@ -225,6 +242,13 @@ class CdkStack(cdk.Stack):
                         )
                     )
                     .next(sfn.Succeed(self, "FaucetAccountCreated"))
+                )
+            )
+            .next(
+                tasks.LambdaInvoke(
+                    self,
+                    "PersistIssuers",
+                    lambda_function=persist_issuers_function,
                 )
             )
             .next(sfn.Succeed(self, "CreatedMarket")),

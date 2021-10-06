@@ -174,14 +174,10 @@ class CdkStack(cdk.Stack):
                     self,
                     "GrabOrderBookTask",
                     lambda_function=grab_order_book_function,
-                    # input_path="$.Payload",
-                    # result_path="$.Payload",
                     result_path="$.orders",
                     result_selector={
                         "work.$": "$.Payload.distinct_accounts",
-                        # "issuers.$": "$.issuers",
                     },
-                    # output_path="$.orders",
                 )
             )
             .next(

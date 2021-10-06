@@ -1,3 +1,7 @@
+This is the market creator stack.
+
+I'm writing this preface, this is no means a real README, but lots below can
+get you started and will be reused.
 
 # Welcome to your CDK Python project!
 

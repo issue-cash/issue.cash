@@ -85,6 +85,32 @@
    <div>
    <h1>Issue.Cash</h1>
    <p><em>An <a href="https://xrpl.org/decentralized-exchange.html">XRPL DEX</a> Development Service</em></p>
+   <h5>This is a Testnet service!</h5>
+   <p>
+   While issue.cash strides to be approchable, there's a few loose ends that
+   will be better handled in the future, such as seeing if you're on the
+   Testnet or not, and letting you know sooner if you can get dispensed / issued
+   cash.
+   </p>
+   <p>
+   &#128679;
+   Please pardon our dust &#128583;
+   &#128679;
+   </p>
+   <p>Need a Testnet account in XUMM?</p>
+   <p>
+       &#128153;
+       <a href="https://xumm.community/tools">xumm.community/tools</a>
+       has a walkthrough for setting up your
+       <a href="https://xumm.app">XUMM wallet</a>
+       with a
+       <a href="https://xrpl.org/xrp-testnet-faucet.html">Testnet account</a>.
+   </p>
+   <p>
+       Go to
+       <a href="https://xumm.community/tools">xumm.community/tools</a>
+       and open "<b>Testnet Account</b>"
+   </p>
    <h2>Current Issuers</h2>
        {% for issuer in issuers %}
        <div class="card">
@@ -98,8 +124,8 @@
                        Created {{ issuer.market_epoch }}
                    </li>
                    <li>
-                       <a href="https://test.xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
-                           Set Trustline with XUMM.Community (Testnet) &disin;
+                       <a href="https://xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
+                           Set Trustline with XUMM.Community (<b>Testnet</b>) &disin;
                            <em>Do this first!</em>
                        </a>
                    </li>
@@ -133,15 +159,6 @@
        <input type="submit" class="text" value="Submit" name="">
    </form>
 
-   <p>Need a Testnet account in XUMM?</p>
-   <p>
-       &#128153;
-       <a href="https://xumm.community/tools">xumm.community/tools</a>
-       has a walkthrough for setting up your 
-       <a href="https://xumm.app">XUMM wallet</a>
-       with a
-       <a href="https://xrpl.org/xrp-testnet-faucet.html">Testnet account</a>.
-   </p>
    </div>
    </main>
    <footer>

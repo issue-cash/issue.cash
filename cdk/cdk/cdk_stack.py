@@ -179,6 +179,7 @@ class CdkStack(cdk.Stack):
                     result_path="$.orders",
                     result_selector={
                         "work.$": "$.Payload.distinct_accounts",
+                        "issuers.$": "$.Payload.issuers",
                     },
                     output_path="$.orders",
                 )
@@ -202,7 +203,7 @@ class CdkStack(cdk.Stack):
                     # max_concurrency=30,
                     # does this work?
                     # result_path=sfn.JsonPath.DISCARD,
-                    result_path="$.issuers",
+                    # result_path="$.issuers",
                     result_selector={
                         "issuers.$": "$.issuers"
                     },

@@ -9,7 +9,7 @@ import boto3
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from xrpl.clients import JsonRpcClient
 from xrpl.models.amounts import IssuedCurrencyAmount
-from xrpl.models.transactions import Payment
+from xrpl.models.transactions import Payment, Memo
 from xrpl.wallet import Wallet
 from xrpl.transaction import (
     XRPLReliableSubmissionException,
@@ -41,6 +41,14 @@ index_template = jinja_env.get_template("index.html")
 # issuers = issuers_table_scan_resp["Items"]
 # issuers_map = reduce(lambda a, b: {**a, b["issuer_currency"]: b["seed"]}, issuers, dict())
 
+satirical_branding = Memo(
+    memo_data=(
+        b"Need cash now (on the testnet)?"
+        b" Get cash now (on the testnet)!"
+        b" go to: https://issue.cash"
+    ).hex()
+)
+
 
 def handler(event, context):
     # print("##EVENT")
@@ -65,7 +73,6 @@ def handler(event, context):
     print("issuers are", issuers)
     print("issuers_map are", issuers_map)
 
-
     if path == "/get-cash" and method == "GET" and querystring_dict is not None:
         for currency, account in querystring_dict.items():
             currency_request_seed = issuers_map[currency]
@@ -78,10 +85,11 @@ def handler(event, context):
             )
             issue_tx_missing = Payment(
                 account=issuer_wallet.classic_address,
-                # destination=temp_wallet.classic_address,
                 destination=account,
                 amount=issued_cash,
-                # memos=[satirical_branding],
+                memos=[
+                    satirical_branding,
+                ],
             )
             retried_count = 0
             while retried_count < 5:
@@ -97,7 +105,7 @@ def handler(event, context):
                         "statusCode": 200,
                         "headers": {"Content-Type": "text/plain"},
                         # TODO re-render template with details and txn link
-                        "body": f"Successfully sent $$ to {account}"
+                        "body": f"Successfully sent $$ to {account}",
                     }
                 except XRPLReliableSubmissionException as err:
                     if "tecPATH_DRY" in str(err):
@@ -107,7 +115,7 @@ def handler(event, context):
                             "body": """
                             You'll need to set a Trustline first!
                             Go back and use the link under the issuer :)
-                            """
+                            """,
                         }
 
                     print("err is", err)
@@ -115,7 +123,7 @@ def handler(event, context):
             return {
                 "statusCode": 500,
                 "headers": {"Content-Type": "text/plain"},
-                "body": "Try again in a few moments!"
+                "body": "Try again in a few moments!",
             }
 
     if path == "/":
@@ -126,6 +134,4 @@ def handler(event, context):
             "body": index_html,
         }
 
-    return {
-        "statusCode": 404
-    }
+    return {"statusCode": 404}

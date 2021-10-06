@@ -26,6 +26,7 @@ Resources:
       CorsConfiguration:
         AllowMethods:
           - GET
+          - POST
         AllowOrigins:
           - "*"
 
@@ -36,6 +37,7 @@ Resources:
       Handler: app.handler
       MemorySize: 128
       Runtime: python3.9
+      Timeout: 15
       Environment:
         Variables: 
           ISSUERS_TABLE_NAME: !Ref IssuersTableName

@@ -75,9 +75,22 @@
    <ul>
        {% for issuer in issuers %}
        <li>{{ issuer.issuer_currency }}: 
-           <a href="https://explorer-testnet.xrplf.org/{{ issuer.account }}">
-               {{ issuer.account }}
-           </a>
+           <ul>
+               <li>
+                   <a href="https://explorer-testnet.xrplf.org/{{ issuer.account }}">
+                       {{ issuer.account }}
+                   </a>
+               </li>
+               <li>
+                   <a href="https://sologenic.org/trade?network=testnet&market={{ issuer.issuer_currency }}%2B{{ issuer.account }}%2FXRP">
+                       Sologenic Testnet Market ({{ issuer.issuer_currency }}/XRP)
+                   </a>
+               </li>
+               <li>
+                   <a href="https://test.xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
+                       Set Trustline with XUMM (Testnet)
+                   </a>
+               </li>
        </li>
        {% endfor %}
    </ul>

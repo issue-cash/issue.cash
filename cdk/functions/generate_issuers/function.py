@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-import boto3
+# import boto3
 
 from xrpl.clients import JsonRpcClient
 from xrpl.models.amounts import IssuedCurrencyAmount, Amount
@@ -21,11 +21,11 @@ from xrpl.transaction import (
 # Testnet client
 testnet_client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
 
-dynamodb = boto3.resource("dynamodb")
-
-ISSUERS_TABLE_NAME = os.environ["ISSUERS_TABLE_NAME"]
-
-issuers_table = dynamodb.Table(ISSUERS_TABLE_NAME)
+# dynamodb = boto3.resource("dynamodb")
+#
+# ISSUERS_TABLE_NAME = os.environ["ISSUERS_TABLE_NAME"]
+#
+# issuers_table = dynamodb.Table(ISSUERS_TABLE_NAME)
 
 
 def handler(event, context):

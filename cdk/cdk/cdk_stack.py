@@ -248,7 +248,7 @@ class CdkStack(cdk.Stack):
                             lambda_function=generate_orders_function,
                         )
                     )
-                    .next(sfn.Succeed(self, "FaucetAccountCreated"))
+                    .next(sfn.Succeed(self, "DistinctOrdersCreated"))
                 )
             )
             .next(

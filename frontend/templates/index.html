@@ -126,6 +126,14 @@
                    <li>
                        Created {{ issuer.market_epoch }}
                    </li>
+                   {% if issuer.nuked %}
+                   <li>
+                       &#9762;&#65039;
+                       <b><em>NUKED!</em></b>
+                       <small><em>Wait for the next round&hellip;</em></small>
+                       &#9762;&#65039;
+                   </li>
+                   {% endif %}
                    <li>
                        <a href="https://xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
                            Set Trustline with XUMM.Community (<b>Testnet</b>) &disin;

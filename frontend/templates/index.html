@@ -119,7 +119,15 @@
    </p>
    <hr>
    <h2>Current Issuers</h2>
-       <small class="refreshTimer"><em>Refreshes in {{ 300 - cached_length }} seconds</em></small>
+       <small class="refreshTimer">
+           <em>
+               Cached result, refresh in
+               <span id="refreshTimerTime">
+                   {{ 300 - cached_length }}
+               </span>
+               seconds &hellip;
+           </em>
+       </small>
        {% for issuer in issuers %}
        <div class="card">
 
@@ -200,6 +208,14 @@
       document.body.appendChild(el);
       document.body.appendChild(el2);
    }
+   setInterval(() => {
+        const refreshTimerTimeEl = document.getElementById("refreshTimerTime");
+        const currentTime = parseInt(refreshTimerTimeEl.textContent);
+        const newTime = currentTime - 1;
+        if (newTime >= 0) {
+            refreshTimerTimeEl.textContent = newTime;
+        }
+   }, 1000);
    </script>
 </body>
 </html>

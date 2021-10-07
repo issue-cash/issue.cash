@@ -22,6 +22,8 @@ testnet_client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
 dynamodb = boto3.resource("dynamodb")
 
 ISSUERS_TABLE_NAME = os.environ["ISSUERS_TABLE_NAME"]
+# in seconds
+CACHE_MAX_AGE = 300
 
 issuers_table = dynamodb.Table(ISSUERS_TABLE_NAME)
 
@@ -81,8 +83,7 @@ def handler(event, context):
     execution_start_time = datetime.utcnow()
 
     # bust cache?
-    # if (cached_length := execution_start_time - CACHE_START).seconds > 300:
-    if (execution_start_time - CACHE_START).seconds > 300:
+    if (cached_length := execution_start_time - CACHE_START).seconds > CACHE_MAX_AGE:
         ISSUERS, ISSUERS_MAP = get_issuers()
         CACHE_START = execution_start_time
 
@@ -151,7 +152,11 @@ def handler(event, context):
             }
 
     if path == "/":
-        index_html = index_template.render(issuers=ISSUERS)
+        index_html = index_template.render(
+            issuers=ISSUERS,
+            cached_length=cached_length.seconds,
+            max_age=CACHE_MAX_AGE,
+        )
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "text/html"},

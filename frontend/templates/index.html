@@ -21,6 +21,10 @@
             z-index: 99;
         }
 
+        small.refreshTimer {
+            font-size: 60%;
+        }
+
         .moneyWing, .coin {
             position: absolute;
             width: 64px;
@@ -115,6 +119,7 @@
    </p>
    <hr>
    <h2>Current Issuers</h2>
+       <small class="refreshTimer"><em>Refreshes in {{ 300 - cached_length }} seconds</em></small>
        {% for issuer in issuers %}
        <div class="card">
 

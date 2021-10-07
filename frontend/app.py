@@ -23,7 +23,7 @@ dynamodb = boto3.resource("dynamodb")
 
 ISSUERS_TABLE_NAME = os.environ["ISSUERS_TABLE_NAME"]
 # in seconds
-CACHE_MAX_AGE = 300
+CACHE_MAX_AGE = 900
 
 issuers_table = dynamodb.Table(ISSUERS_TABLE_NAME)
 

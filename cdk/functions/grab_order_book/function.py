@@ -84,8 +84,6 @@ def handler(event, context):
         ]
         for offer in glommed
     ]
-    # TODO tmp slice for debug
-    minimal_usd_offers = minimal_usd_offers[:10]
 
     return {
         # "offers": minimal_usd_offers,

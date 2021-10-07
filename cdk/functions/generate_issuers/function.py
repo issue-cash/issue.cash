@@ -29,7 +29,6 @@ issuers_table = dynamodb.Table(ISSUERS_TABLE_NAME)
 
 
 def handler(event, context):
-    # return "Hello, World!"
     wallet_seed = event["seed"]
     wallet_account = event["account"]
     issuer_wallet = Wallet(seed=wallet_seed, sequence=None)
@@ -49,16 +48,7 @@ def handler(event, context):
         issuer_wallet_set_tx,
         testnet_client,
     )
-    # persist issuers
-    # TODO the returned data is every row we persist
-    # put_resp = issuers_table.put_item(
-    #     Item=dict(
-    #         issuer_currency="USD",
-    #         seed=wallet_seed,
-    #         account=wallet_account,
-    #         market_epoch=datetime.utcnow().isoformat(),
-    #     ),
-    # )
+
     return {
         "issuers": {
             "USD": {"seed": wallet_seed, "acct": wallet_account},

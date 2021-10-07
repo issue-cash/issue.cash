@@ -215,9 +215,9 @@ class CdkStack(cdk.Stack):
                     # works pretty good with the faucet endpoint, this is also
                     # the expected max txns the faucet can put in a single
                     # ledger
-                    # max_concurrency=3,
+                    max_concurrency=3,
                     # max_concurrency=4,
-                    max_concurrency=5,
+                    # max_concurrency=5,
                     # max_concurrency=10,
                     # CRAZZZY
                     # max_concurrency=30,
@@ -227,9 +227,6 @@ class CdkStack(cdk.Stack):
                     #
                     # does this work?
                     result_path=sfn.JsonPath.DISCARD,
-                    # result_path="$.issuers",
-                    # result_selector={"issuers.$": "$.issuers"},
-                    # output_path="$.issuers",
                 ).iterator(
                     tasks.LambdaInvoke(
                         self,

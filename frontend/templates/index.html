@@ -168,32 +168,25 @@
        <a href="https://github.com/issue-cash/issue.cash">source</a>
    </footer>
 
-   <!-- <div class="moneyWing"></div> -->
-   <!-- <div class="coin"></div> -->
    <div class="coin fly1 start1"></div>
    <div class="coin fly2 start2"></div>
-   <!-- <div class="coin fly3 start3"></div> -->
-   <!-- <div class="moneyWing fly1 start1"></div> -->
-   <!-- <div class="moneyWing fly2 start2"></div> -->
    <div class="moneyWing fly3 start3"></div>
 
    <script type="text/javascript">
-       for (i = 0; i < 53; i++ ) {
-                  // console.log(Math.floor(Math.random()*3));
-                  el = document.createElement('div');
-                  el2 = document.createElement('div');
-                  el.classList.add('coin');
-                  el.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
-                  el2.classList.add('moneyWing');
-                  el2.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
-                  el.style.right = `${Math.random() * 70 * -1}%`
-                  el.style.top = `${Math.random() * -90}%`;
-                  el2.style.right = `${Math.random() * 70 * -3}%`
-                  el2.style.top = `${Math.random() * -90}%`;
-                  document.body.appendChild(el)
-                  document.body.appendChild(el2)
-      }
-
+   for (i = 0; i < 53; i++ ) {
+      el = document.createElement('div');
+      el2 = document.createElement('div');
+      el.classList.add('coin');
+      el.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
+      el2.classList.add('moneyWing');
+      el2.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
+      el.style.right = `${Math.random() * 70 * -1}%`
+      el.style.top = `${Math.random() * -90}%`;
+      el2.style.right = `${Math.random() * 70 * -3}%`
+      el2.style.top = `${Math.random() * -90}%`;
+      document.body.appendChild(el);
+      document.body.appendChild(el2);
+   }
    </script>
 </body>
 </html>

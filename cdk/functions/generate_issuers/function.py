@@ -63,6 +63,6 @@ def handler(event, context):
         "issuers": {
             "USD": {"seed": wallet_seed, "acct": wallet_account},
             # TODO expand to all issuers
-            "dfg": {"seed": "123", "acct": "abc123"},
+            # "dfg": {"seed": "123", "acct": "abc123"},
         }
     }

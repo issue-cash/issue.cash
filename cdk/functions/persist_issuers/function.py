@@ -12,7 +12,7 @@ from datetime import datetime
 
 import boto3
 
-from xrpl.wallet import Wallet
+# from xrpl.wallet import Wallet
 
 
 dynamodb = boto3.resource("dynamodb")
@@ -30,17 +30,17 @@ def handler(event, context):
     # persist issuers
     # TODO the returned data is every row we persist
     # just usd rn
-    currency = "USD"
-    wallet_seed = issuers[currency]
-    issuer_wallet = Wallet(seed=wallet_seed, sequence=None)
-    wallet_account = issuer_wallet.classic_address
-    put_resp = issuers_table.put_item(
-        Item=dict(
-            issuer_currency=currency,
-            seed=wallet_seed,
-            account=wallet_account,
-            market_epoch=datetime.utcnow().isoformat(),
-        ),
-    )
+    # currency = "USD"
+    for currency, meta in issuers.items():
+        wallet_seed = meta["seed"]
+        wallet_account = meta["acct"]
+        put_resp = issuers_table.put_item(
+            Item=dict(
+                issuer_currency=currency,
+                seed=wallet_seed,
+                account=wallet_account,
+                market_epoch=datetime.utcnow().isoformat(),
+            ),
+        )
 
     return event

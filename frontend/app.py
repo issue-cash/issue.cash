@@ -123,11 +123,12 @@ def handler(event, context):
                         client=testnet_client,
                     )
                     issue_tx_resp = send_reliable_submission(issue_tx, testnet_client)
+
+                    # TODO re-render template with details and txn link
                     print(issue_tx_resp)
                     return {
                         "statusCode": 200,
                         "headers": {"Content-Type": "text/plain"},
-                        # TODO re-render template with details and txn link
                         "body": f"Successfully sent $$ to {account}",
                     }
                 except XRPLReliableSubmissionException as err:

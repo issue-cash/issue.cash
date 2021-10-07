@@ -2,7 +2,7 @@
 Wrapping xrpl-py, a function that's pluggable into a FaaS platform that will
 handle it's timeout and provisioning
 
-If this wasn't the testnet, things wouldn't be so loose. 
+If this wasn't the testnet, things wouldn't be so loose.
 
 i.e., We don't care if we loose the temp_wallet because of a timeout.
 """

@@ -79,6 +79,20 @@ class CdkStack(cdk.Stack):
                 "ISSUERS_TABLE_NAME": issuers_table.table_name,
             },
         )
+        persist_issuers_function = lambda_.Function(
+            self,
+            "PersistIssuersFunction",
+            code=lambda_.Code.from_asset(
+                "functions/persist_issuers/",
+                bundling=bundle_python_function_with_requirements,
+            ),
+            runtime=lambda_.Runtime.PYTHON_3_9,
+            handler="function.handler",
+            timeout=cdk.Duration.seconds(19),
+            environment={
+                "ISSUERS_TABLE_NAME": issuers_table.table_name,
+            },
+        )
         # add table r/w permissions to our issuer generator
         issuers_table_dynamodb_crud_statement = iam.PolicyStatement(
             actions=[
@@ -96,6 +110,9 @@ class CdkStack(cdk.Stack):
             ],
         )
         generate_issuers_function.add_to_role_policy(
+            issuers_table_dynamodb_crud_statement
+        )
+        persist_issuers_function.add_to_role_policy(
             issuers_table_dynamodb_crud_statement
         )
 
@@ -157,9 +174,8 @@ class CdkStack(cdk.Stack):
                     "GenerateIssuers",
                     input_path="$.Payload",
                     lambda_function=generate_issuers_function,
+                    # what are we picking from the output?
                     result_selector={"issuers.$": "$.Payload.issuers"},
-                    # result_path="$.issuers",
-                    # output_path="$.Payload.issuers",
                 )
             )
             # .next(
@@ -174,10 +190,12 @@ class CdkStack(cdk.Stack):
                     self,
                     "GrabOrderBookTask",
                     lambda_function=grab_order_book_function,
-                    result_path="$.orders",
+                    # what are we picking from output?
                     result_selector={
                         "work.$": "$.Payload.distinct_accounts",
                     },
+                    # where do we put the output in the state?
+                    result_path="$.orders",
                 )
             )
             .next(
@@ -185,36 +203,43 @@ class CdkStack(cdk.Stack):
                     self,
                     "GenerateOrderWallets",
                     # not relevant with output_path changed above
-                    items_path="$.work",
+                    items_path="$.orders.work",
                     # parameters={
                     #     "issuers.$": "$.issuers",
                     #     "work.$": "$.orders.work",
                     # },
+                    #
+                    #
+                    # concurrency
+                    #
                     # works pretty good with the faucet endpoint, this is also
                     # the expected max txns the faucet can put in a single
                     # ledger
-                    max_concurrency=4,
+                    max_concurrency=3,
+                    # max_concurrency=4,
+                    # max_concurrency=5,
                     # max_concurrency=10,
                     # CRAZZZY
                     # max_concurrency=30,
+                    #
+                    #
+                    # results
+                    #
                     # does this work?
-                    # result_path=sfn.JsonPath.DISCARD,
-                    # result_path="$.issuers",
-                    result_selector={
-                        "issuers.$": "$.issuers"
-                    },
-                    output_path="$.issuers",
+                    result_path=sfn.JsonPath.DISCARD,
                 ).iterator(
                     tasks.LambdaInvoke(
                         self,
                         "GenerateOrderWalletFromFaucet",
                         lambda_function=generate_faucet_wallet_function,
                         # parameters=
-                        result_path="$.wallet",
+                        # pick from the output
                         result_selector={
                             "seed.$": "$.Payload.seed",
                             "account.$": "$.Payload.account",
                         },
+                        # place the output in the state
+                        result_path="$.wallet",
                     )
                     .next(
                         tasks.LambdaInvoke(
@@ -223,7 +248,14 @@ class CdkStack(cdk.Stack):
                             lambda_function=generate_orders_function,
                         )
                     )
-                    .next(sfn.Succeed(self, "FaucetAccountCreated"))
+                    .next(sfn.Succeed(self, "DistinctOrdersCreated"))
+                )
+            )
+            .next(
+                tasks.LambdaInvoke(
+                    self,
+                    "PersistIssuers",
+                    lambda_function=persist_issuers_function,
                 )
             )
             .next(sfn.Succeed(self, "CreatedMarket")),

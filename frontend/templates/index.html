@@ -12,12 +12,27 @@
         }
 
         footer {
-            font-size: 50%;
+            margin-top: 12px;
+            font-size: 61%;
         }
 
         main > div {
             position: relative;
             z-index: 99;
+        }
+
+        .card {
+            width: 40vw;
+            margin: 3vw;
+            padding: 3vw 5vw;
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+            outline: black;
+            box-shadow: 1vw 1vw #444;
+        }
+
+        small.refreshTimer {
+            font-size: 60%;
         }
 
         .moneyWing, .coin {
@@ -32,7 +47,7 @@
         }
 
         .coin::after {
-            content: "🪙";
+            content: "\1fa99";
         }
 
         @keyframes fly {
@@ -85,19 +100,20 @@
    <div>
    <h1>Issue.Cash</h1>
    <p><em>An <a href="https://xrpl.org/decentralized-exchange.html">XRPL DEX</a> Development Service</em></p>
-   <h5>This is a Testnet service!</h5>
+   <h3>This is a Testnet service!</h3>
+   <p>
+   &#128679;
+   <em>Please pardon our dust</em>
+   &#128583;
+   &#128679;
+   </p>
    <p>
    While issue.cash strides to be approchable, there's a few loose ends that
    will be better handled in the future, such as seeing if you're on the
    Testnet or not, and letting you know sooner if you can get dispensed / issued
    cash.
    </p>
-   <p>
-   &#128679;
-   Please pardon our dust &#128583;
-   &#128679;
-   </p>
-   <p>Need a Testnet account in XUMM?</p>
+   <h3>Need a Testnet account in XUMM?</h3>
    <p>
        &#128153;
        <a href="https://xumm.community/tools">xumm.community/tools</a>
@@ -111,6 +127,7 @@
        <a href="https://xumm.community/tools">xumm.community/tools</a>
        and open "<b>Testnet Account</b>"
    </p>
+   <hr>
    <h2>Current Issuers</h2>
        {% for issuer in issuers %}
        <div class="card">
@@ -123,6 +140,14 @@
                    <li>
                        Created {{ issuer.market_epoch }}
                    </li>
+                   {% if issuer.nuked %}
+                   <li>
+                       &#9762;&#65039;
+                       <b><em>NUKED!</em></b>
+                       <small><em>Wait for the next round&hellip;</em></small>
+                       &#9762;&#65039;
+                   </li>
+                   {% endif %}
                    <li>
                        <a href="https://xumm.community/?issuer={{ issuer.account }}&currency={{ issuer.issuer_currency }}&limit=1000000000">
                            Set Trustline with XUMM.Community (<b>Testnet</b>) &disin;
@@ -143,54 +168,63 @@
                        </small>
                    </li>
                </ul>
+               <form action="get-cash">
+                   <label for="{{ issuer.issuer_currency }}">
+                       Want some cash? &#129297;
+                   </label>
+                   <input type="text" 
+                          class="text"
+                          placeholder="rABC123..." 
+                          name="{{ issuer.issuer_currency }}">
+                   <input type="submit" class="text" value="Submit">
+               </form>
        </div>
        {% endfor %}
-   <p>Want some cash?  🤑</p>
-
-   <form action="get-cash">
-       {% for issuer in issuers %}
-       <label for="{{ issuer.issuer_currency }}"> {{ issuer.issuer_currency }}
-       </label>
-       <input type="text" 
-              class="text"
-              placeholder="rABC123..." 
-              name="{{ issuer.issuer_currency }}">
-       {% endfor %}
-       <input type="submit" class="text" value="Submit" name="">
-   </form>
 
    </div>
    </main>
    <footer>
        <a href="https://github.com/issue-cash/issue.cash">source</a>
+       <small class="refreshTimer">
+           <em>
+               Cached results, refresh in
+               <span id="refreshTimerTime">
+                   {{ 300 - cached_length }}
+               </span>
+               seconds &hellip;
+           </em>
+       </small>
    </footer>
 
-   <!-- <div class="moneyWing"></div> -->
-   <!-- <div class="coin"></div> -->
    <div class="coin fly1 start1"></div>
    <div class="coin fly2 start2"></div>
-   <!-- <div class="coin fly3 start3"></div> -->
-   <!-- <div class="moneyWing fly1 start1"></div> -->
-   <!-- <div class="moneyWing fly2 start2"></div> -->
    <div class="moneyWing fly3 start3"></div>
 
    <script type="text/javascript">
-       for (i = 0; i < 53; i++ ) {
-                  // console.log(Math.floor(Math.random()*3));
-                  el = document.createElement('div');
-                  el2 = document.createElement('div');
-                  el.classList.add('coin');
-                  el.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
-                  el2.classList.add('moneyWing');
-                  el2.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
-                  el.style.right = `${Math.random() * 70 * -1}%`
-                  el.style.top = `${Math.random() * -90}%`;
-                  el2.style.right = `${Math.random() * 70 * -3}%`
-                  el2.style.top = `${Math.random() * -90}%`;
-                  document.body.appendChild(el)
-                  document.body.appendChild(el2)
-      }
-
+   for (i = 0; i < 53; i++ ) {
+      let el = document.createElement('div');
+      let el2 = document.createElement('div');
+      el.classList.add('coin');
+      el.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
+      el2.classList.add('moneyWing');
+      el2.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
+      el.style.right = `${Math.random() * -70 + -30}%`
+      el.style.top = `${Math.random() * -90 + -30}%`;
+      el2.style.right = `${Math.random() * -70 + -10}%`
+      el2.style.top = `${Math.random() * -90 + -30}%`;
+      document.body.appendChild(el);
+      document.body.appendChild(el2);
+   }
+   setInterval(() => {
+        const refreshTimerTimeEl = document.getElementById("refreshTimerTime");
+        const currentTime = parseInt(refreshTimerTimeEl.textContent);
+        const newTime = currentTime - 1;
+        if (newTime >= 0) {
+          refreshTimerTimeEl.textContent = newTime;
+        } else {
+          clearInterval(this);
+        }
+   }, 1000);
    </script>
 </body>
 </html>

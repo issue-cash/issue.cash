@@ -66,18 +66,23 @@ satirical_branding = Memo(
 
 
 def handler(event, context):
+    # debug...
     # print("##EVENT")
     # print(event)
     # print("##CONTEXT")
     # print(context)
+
+    # we utilize the execution container's garbage collection and want to
+    # overwrite it when we bust the cache
     global CACHE_START
     global ISSUERS
     global ISSUERS_MAP
 
     execution_start_time = datetime.utcnow()
 
-    # bust cache
-    if (cached_length := execution_start_time - CACHE_START).seconds > (900):
+    # bust cache?
+    # if (cached_length := execution_start_time - CACHE_START).seconds > 300:
+    if (execution_start_time - CACHE_START).seconds > 300:
         ISSUERS, ISSUERS_MAP = get_issuers()
         CACHE_START = execution_start_time
 

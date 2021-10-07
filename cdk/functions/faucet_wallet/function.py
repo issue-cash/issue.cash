@@ -10,7 +10,7 @@ def handler(event, context):
     temp_wallet = None
     while temp_wallet is None:
         try:
-            temp_wallet = generate_faucet_wallet(faucet_client, None)
+            temp_wallet = generate_faucet_wallet(faucet_client)
         except Exception:
             time.sleep(10 * random.random() + 1)
     return {

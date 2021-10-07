@@ -21,6 +21,16 @@
             z-index: 99;
         }
 
+        .card {
+            width: 40vw;
+            margin: 3vw;
+            padding: 3vw 5vw;
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+            outline: black;
+            box-shadow: 1vw 1vw #444;
+        }
+
         small.refreshTimer {
             font-size: 60%;
         }
@@ -46,7 +56,7 @@
             }
 
             to {
-                transform: translate(-1600px, 1600px);
+                transform: translate(-2900px, 1900px);
             }
         }
 
@@ -119,15 +129,6 @@
    </p>
    <hr>
    <h2>Current Issuers</h2>
-       <small class="refreshTimer">
-           <em>
-               Cached result, refresh in
-               <span id="refreshTimerTime">
-                   {{ 300 - cached_length }}
-               </span>
-               seconds &hellip;
-           </em>
-       </small>
        {% for issuer in issuers %}
        <div class="card">
 
@@ -167,26 +168,30 @@
                        </small>
                    </li>
                </ul>
+               <p>Want some cash?  🤑</p>
+               <form action="get-cash">
+                   <input type="text" 
+                          class="text"
+                          placeholder="rABC123..." 
+                          name="{{ issuer.issuer_currency }}">
+                   <input type="submit" class="text" value="Submit">
+               </form>
        </div>
        {% endfor %}
-   <p>Want some cash?  🤑</p>
-
-   <form action="get-cash">
-       {% for issuer in issuers %}
-       <label for="{{ issuer.issuer_currency }}"> {{ issuer.issuer_currency }}
-       </label>
-       <input type="text" 
-              class="text"
-              placeholder="rABC123..." 
-              name="{{ issuer.issuer_currency }}">
-       {% endfor %}
-       <input type="submit" class="text" value="Submit" name="">
-   </form>
 
    </div>
    </main>
    <footer>
        <a href="https://github.com/issue-cash/issue.cash">source</a>
+       <small class="refreshTimer">
+           <em>
+               Cached results, refresh in
+               <span id="refreshTimerTime">
+                   {{ 300 - cached_length }}
+               </span>
+               seconds &hellip;
+           </em>
+       </small>
    </footer>
 
    <div class="coin fly1 start1"></div>
@@ -195,16 +200,16 @@
 
    <script type="text/javascript">
    for (i = 0; i < 53; i++ ) {
-      el = document.createElement('div');
-      el2 = document.createElement('div');
+      let el = document.createElement('div');
+      let el2 = document.createElement('div');
       el.classList.add('coin');
       el.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
       el2.classList.add('moneyWing');
       el2.classList.add(`fly${Math.floor(Math.random()*3+1)}`);
-      el.style.right = `${Math.random() * 70 * -1}%`
-      el.style.top = `${Math.random() * -90}%`;
-      el2.style.right = `${Math.random() * 70 * -3}%`
-      el2.style.top = `${Math.random() * -90}%`;
+      el.style.right = `${Math.random() * -70 + -30}%`
+      el.style.top = `${Math.random() * -90 + -30}%`;
+      el2.style.right = `${Math.random() * -70 + -10}%`
+      el2.style.top = `${Math.random() * -90 + -30}%`;
       document.body.appendChild(el);
       document.body.appendChild(el2);
    }
@@ -213,7 +218,9 @@
         const currentTime = parseInt(refreshTimerTimeEl.textContent);
         const newTime = currentTime - 1;
         if (newTime >= 0) {
-            refreshTimerTimeEl.textContent = newTime;
+          refreshTimerTimeEl.textContent = newTime;
+        } else {
+          clearInterval(this);
         }
    }, 1000);
    </script>

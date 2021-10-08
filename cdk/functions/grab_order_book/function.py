@@ -9,10 +9,11 @@ MAINNET_GATEHUB = "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"
 
 USD_bitstamp = IssuedCurrency(currency="USD", issuer=MAINNET_BITSTAMP)
 EUR_bitstamp = IssuedCurrency(currency="EUR", issuer=MAINNET_BITSTAMP)
+JPY_bitstamp = IssuedCurrency(currency="JPY", issuer=MAINNET_BITSTAMP)
 USD_gatehub = IssuedCurrency(currency="USD", issuer=MAINNET_GATEHUB)
 EUR_gatehub = IssuedCurrency(currency="EUR", issuer=MAINNET_GATEHUB)
 
-gatehub_currency_map = dict(USD=USD_gatehub, EUR=EUR_gatehub)
+gatehub_currency_map = dict(USD=USD_gatehub, EUR=EUR_gatehub, JPY=JPY_bitstamp)
 bitstamp_currency_map = dict(USD=USD_bitstamp, EUR=EUR_bitstamp)
 
 testnet_client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
@@ -96,16 +97,37 @@ def handler(event, context):
     for issuer_currency, wallet_meta in issuers.items():
         issuer_seed = wallet_meta["seed"]
 
+        any__xrp_offers = []
+        xrp__any_offers = []
+        bitstamp_any__xrp_offers = []
+        bitstamp_xrp__any_offers = []
+        gatehub_any__xrp_offers = []
+        gatehub_xrp__any_offers = []
+        if issuer_currency in bitstamp_currency_map:
+            bitstamp_any__xrp_offers = get_book_offers(XRP(), bitstamp_currency_map[issuer_currency])
+            # any__xrp_offers += get_book_offers(
+            #     XRP(), bitstamp_currency_map[issuer_currency]
+            # )
+            bitstamp_xrp__any_offers = get_book_offers(bitstamp_currency_map[issuer_currency], XRP())
+            # xrp__any_offers += get_book_offers(
+            #     XRP(), bitstamp_currency_map[issuer_currency]
+            # )
 
-        bitstamp_any__xrp_offers = get_book_offers(XRP(), bitstamp_currency_map[issuer_currency])
-        bitstamp_xrp__any_offers = get_book_offers(bitstamp_currency_map[issuer_currency], XRP())
-        gatehub_any__xrp_offers = get_book_offers(XRP(), gatehub_currency_map[issuer_currency])
-        gatehub_xrp__any_offers = get_book_offers(gatehub_currency_map[issuer_currency], XRP())
+        if issuer_currency in gatehub_currency_map:
+            gatehub_any__xrp_offers = get_book_offers(XRP(), gatehub_currency_map[issuer_currency])
+            # any__xrp_offers += get_book_offers(
+            #     XRP(), gatehub_currency_map[issuer_currency]
+            # )
+            gatehub_xrp__any_offers = get_book_offers(gatehub_currency_map[issuer_currency], XRP())
+            # xrp__any_offers += get_book_offers(
+            #     gatehub_currency_map[issuer_currency], XRP()
+            # )
 
         all_offers += [
             offer
             for glommed in [
                 glom(offers, [glom_spec_xrp_any])
+                # for offers in [any__xrp_offers]
                 for offers in [
                     bitstamp_any__xrp_offers,
                     gatehub_any__xrp_offers,
@@ -113,6 +135,7 @@ def handler(event, context):
             ]
             + [
                 glom(offers, [Coalesce(glom_spec_any_xrp, SKIP)])
+                # for offers in [xrp__any_offers]
                 for offers in [
                     bitstamp_xrp__any_offers,
                     gatehub_xrp__any_offers,

@@ -153,6 +153,13 @@ class CdkStack(cdk.Stack):
             timeout=cdk.Duration.seconds(900),
             memory_size=512,
         )
+        # definition=tasks.LambdaInvoke(
+        #     self,
+        #     "GenerateFaucetWalletTask",
+        #     lambda_function=generate_faucet_wallet_function,
+        #     result_selector={"issuer_wallet.$", "$.Payload.issuers"},
+        #     output_path="$.issuer_wallet",
+        # ).next(
 
         state_machine = sfn.StateMachine(
             self,
@@ -164,15 +171,74 @@ class CdkStack(cdk.Stack):
             #         lambda_function=generate_faucet_wallet_function,
             #     )
             # )
-            definition=tasks.LambdaInvoke(
+            definition=sfn.Map(
                 self,
-                "GenerateFaucetWalletTask",
-                lambda_function=generate_faucet_wallet_function,
-            ).next(
+                "GenerateIssuerWallets",
+                # not relevant with output_path changed above
+                items_path="$.issuers",
+                #
+                #
+                # concurrency
+                #
+                # works pretty good with the faucet endpoint, this is also
+                # the expected max txns the faucet can put in a single
+                # ledger
+                max_concurrency=10,
+                # result_path=
+            ).iterator(
+                tasks.LambdaInvoke(
+                    self,
+                    "GenerateIssuerWalletFromFaucet",
+                    lambda_function=generate_faucet_wallet_function,
+                    # parameters=
+                    # pick from the output
+                    result_selector={
+                        "seed.$": "$.Payload.seed",
+                        "account.$": "$.Payload.account",
+                    },
+                    # place the output in the state
+                    result_path="$.issuer_wallet",
+                )
+                .next(
+                    tasks.LambdaInvoke(
+                        self,
+                        "GenerateIssuersNew",
+                        # input_path="$.Payload",
+                        lambda_function=generate_issuers_function,
+                        # what are we picking from the output?
+                        result_selector={"issuers.$": "$.Payload.issuers"},
+                    )
+                )
+                .next(
+                    tasks.LambdaInvoke(
+                        self,
+                        "GrabIssuerOrderBookTask",
+                        lambda_function=grab_order_book_function,
+                        # what are we picking from output?
+                        result_selector={
+                            "work.$": "$.Payload.distinct_accounts",
+                        },
+                        # where do we put the output in the state?
+                        result_path="$.orders",
+                    )
+                )
+                .next(sfn.Succeed(self, "CreatedIssuerWallets"))
+            )
+            .next(
+                tasks.LambdaInvoke(
+                    self,
+                    "GenerateFaucetWalletTask",
+                    lambda_function=generate_faucet_wallet_function,
+                    # result_selector={"issuer_wallet.$": "$.Payload.issuers"},
+                    result_selector={"issuer_wallet.$": "$.Payload"},
+                    # output_path="$.Payload",
+                )
+            )
+            .next(
                 tasks.LambdaInvoke(
                     self,
                     "GenerateIssuers",
-                    input_path="$.Payload",
+                    # input_path="$.Payload",
                     lambda_function=generate_issuers_function,
                     # what are we picking from the output?
                     result_selector={"issuers.$": "$.Payload.issuers"},
